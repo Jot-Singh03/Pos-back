@@ -1,9 +1,12 @@
+// index.ts
 import express from "express";
+import serverless from "serverless-http";
 import cors from "cors";
-import mongoose from "mongoose";
 import dotenv from "dotenv";
 import connectDB from "./config/db";
 import { errorHandler } from "./middlewares/errorHandler";
+
+// Import your routes
 import menuRoutes from "./routes/menuRoutes";
 import orderRoutes from "./routes/orderRoutes";
 import adminRoutes from "./routes/adminRoutes";
@@ -11,21 +14,21 @@ import loyaltyRoutes from "./routes/loyaltyRoutes";
 import healthRoutes from "./routes/healthRoutes";
 import categoryRoutes from "./routes/categoryRoutes";
 import RegistrationRoutes from "./routes/RegistrationRoutes";
-import { migrateOrderNumbers } from "./utils/migrateOrderNumbers";
 import DiscountRoutes from "./routes/DiscountRoutes";
+import { migrateOrderNumbers } from "./utils/migrateOrderNumbers";
 
-// Load env vars
+// Load environment variables
 dotenv.config();
 
 // Connect to database
 connectDB();
 
+// Create Express app
 const app = express();
-const port = process.env.PORT || 5001;
 
-// Middleware
+// CORS middleware
 const allowedOrigins = [
-  "https://pos-frontend-cjom.vercel.app", // your deployed frontend
+  "https://pos-frontend-cjom.vercel.app",
   "http://localhost:3000",
   "http://localhost:3001",
   "http://127.0.0.1:3000",
@@ -34,11 +37,9 @@ const allowedOrigins = [
 app.use(
   cors({
     origin: function (origin, callback) {
-      // allow requests with no origin (like Postman)
-      if (!origin) return callback(null, true);
+      if (!origin) return callback(null, true); // allow Postman / server-side
       if (allowedOrigins.indexOf(origin) === -1) {
-        const msg = `The CORS policy for this site does not allow access from the specified Origin: ${origin}`;
-        return callback(new Error(msg), false);
+        return callback(new Error(`CORS policy: ${origin} not allowed`), false);
       }
       return callback(null, true);
     },
@@ -48,6 +49,7 @@ app.use(
   })
 );
 
+// JSON parsing middleware
 app.use(express.json());
 
 // Routes
@@ -58,29 +60,20 @@ app.use("/api/loyalty", loyaltyRoutes);
 app.use("/api", healthRoutes);
 app.use("/api/categories", categoryRoutes);
 app.use("/api", DiscountRoutes);
-
-//Employee
 app.use("/api/new", RegistrationRoutes);
 
-// Error handling middleware
+// Error handler
 app.use(errorHandler);
 
-// Start server
-app.listen(port, async () => {
-  console.log(`Server is running on port ${port}`);
-  console.log(
-    `CORS origins allowed: ${[
-      "http://localhost:3000",
-      "http://localhost:3001",
-      "http://127.0.0.1:3000",
-    ].join(", ")}`
-  );
-  console.log(`API base URL: http://localhost:${port}/api`);
-
-  // Run migration for existing orders
+// Optional: run migrations on deployment
+(async () => {
   try {
     await migrateOrderNumbers();
+    console.log("Migration completed");
   } catch (error) {
     console.error("Migration failed:", error);
   }
-});
+})();
+
+// Export Vercel serverless handler
+export const handler = serverless(app);
