@@ -13,6 +13,7 @@ import categoryRoutes from "./routes/categoryRoutes";
 import RegistrationRoutes from "./routes/RegistrationRoutes";
 import { migrateOrderNumbers } from "./utils/migrateOrderNumbers";
 import DiscountRoutes from "./routes/DiscountRoutes";
+
 // Load env vars
 dotenv.config();
 
@@ -26,6 +27,7 @@ const port = process.env.PORT || 5001;
 app.use(
   cors({
     origin: [
+      "https://pos-frontend-cjom.vercel.app",
       "http://localhost:3000",
       "http://localhost:3001",
       "http://127.0.0.1:3000",
