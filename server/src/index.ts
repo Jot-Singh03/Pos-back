@@ -24,19 +24,30 @@ const app = express();
 const port = process.env.PORT || 5001;
 
 // Middleware
+const allowedOrigins = [
+  "https://pos-frontend-cjom.vercel.app", // your deployed frontend
+  "http://localhost:3000",
+  "http://localhost:3001",
+  "http://127.0.0.1:3000",
+];
+
 app.use(
   cors({
-    origin: [
-      "https://pos-frontend-cjom.vercel.app",
-      "http://localhost:3000",
-      "http://localhost:3001",
-      "http://127.0.0.1:3000",
-    ],
+    origin: function (origin, callback) {
+      // allow requests with no origin (like Postman)
+      if (!origin) return callback(null, true);
+      if (allowedOrigins.indexOf(origin) === -1) {
+        const msg = `The CORS policy for this site does not allow access from the specified Origin: ${origin}`;
+        return callback(new Error(msg), false);
+      }
+      return callback(null, true);
+    },
     credentials: true,
     methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
     allowedHeaders: ["Content-Type", "Authorization"],
   })
 );
+
 app.use(express.json());
 
 // Routes
