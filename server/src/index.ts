@@ -31,6 +31,7 @@ app.use(
       "http://localhost:3000",
       "http://localhost:3001",
       "http://127.0.0.1:3000",
+      "https://pos-f.vercel.app"
     ],
     credentials: true,
     methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
