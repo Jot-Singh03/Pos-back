@@ -26,13 +26,14 @@ const port = process.env.PORT || 5001;
 // Middleware
 app.use(
   cors({
-    origin: [
-      "https://pos-frontend-cjom.vercel.app",
-      "http://localhost:3000",
-      "http://localhost:3001",
-      "http://127.0.0.1:3000",
-      "https://pos-demo-mocha.vercel.app"
-    ],
+    // origin: [
+    //   "https://pos-frontend-cjom.vercel.app",
+    //   "http://localhost:3000",
+    //   "http://localhost:3001",
+    //   "http://127.0.0.1:3000",
+    //   "https://pos-demo-mocha.vercel.app"
+    // ],
+    origin: true,
     credentials: true,
     methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
     allowedHeaders: ["Content-Type", "Authorization"],
